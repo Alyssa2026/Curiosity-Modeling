@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------------------------------------
 -- (1) Model the scales used to create chords
 ----------------------------------------------------------------------------------------------------
--- Scales are composed of notes TODO: Use later
+-- Scales are made up of notes
 sig Note {
     value: one Int,
     next: lone Note 
@@ -24,14 +24,16 @@ one sig Scale {
 }
 
 -- Attributes necessary for a wellformed sequence of 8 notes
-    -- Each note must have values between 0-10 (notes a-g)
+    -- Each note must have values between 0-11 (notes a-g)
+    -- The notes in the scale should not be the same
+    -- Each note points to a next note or none
 pred wellformed{
     all scale:Scale|{
        scale.n0.value<=11 and scale.n1.value>=0
        scale.n1.value<=11 and scale.n1.value>=0
        scale.n2.value<=11 and scale.n2.value>=0
        scale.n3.value<=11 and scale.n3.value>=0
-       scale.n4.value<=11 and scale.n4.value>=0
+       scale.n4.value<=11 and scale.n4.value>=0 // works with only 4 notes and this is commented out 
        scale.n5.value<=11 and scale.n5.value>=0
        scale.n6.value<=11 and scale.n6.value>=0
        scale.n7.value<=11 and scale.n7.value>=0
@@ -40,7 +42,7 @@ pred wellformed{
        scale.n1.next=scale.n2
        scale.n2.next=scale.n3
        scale.n3.next=scale.n4
-       scale.n4.next=scale.n5
+       scale.n4.next=scale.n5 // works with only 4 notes and this is commented out 
        scale.n5.next=scale.n6
        scale.n6.next=scale.n7
        scale.n7.next= none
@@ -69,6 +71,7 @@ pred wellformed{
 run{
     wellformed
 } for 5 Int
+-- Basic predicate to ensure two notes are a whole step apart
 pred wholeStep[firstNote, secondNote:Int]{
     add[firstNote,2]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote= subtract[add[firstNote,2],12] 
@@ -76,6 +79,7 @@ pred wholeStep[firstNote, secondNote:Int]{
         secondNote= add[firstNote,2]
     }
 }
+-- Basic predicate to ensure two notes are a half step apart
 pred halfStep[firstNote, secondNote:Int]{
     add[firstNote,1]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote= subtract[add[firstNote,1],12] 
@@ -83,11 +87,10 @@ pred halfStep[firstNote, secondNote:Int]{
         secondNote= add[firstNote,1]
     }
 }
--- Scales can be major 
+-- Basic predicate to create a major scale from any starting note 
 pred majorScale{
     --WWHWWWH
     all scale:Scale, note: Int|{
-     
         scale.n0.value=note implies {
             wholeStep[note, scale.n1.value]
             wholeStep[scale.n1.value, scale.n2.value]
@@ -104,7 +107,7 @@ pred majorScale{
 //     wellformed
 //     majorScale
 // } for 6 Int
--- Scales can be minor
+-- Minor scale, can ignore for now!
 // pred minorScale{
 //     --WHWWWWH
 //     all scale:Scale, note: Int|{
