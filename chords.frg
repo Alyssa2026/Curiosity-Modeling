@@ -16,11 +16,11 @@ one sig Scale {
     n0: one Note, 
    	n1: one Note,
     n2: one Note,
-   	n3: one Note
-    // n4: one Note,
-    // n5: one Note,
-    // n6: one Note,
-    // n7: one Note
+   	n3: one Note,
+    n4: one Note,
+    n5: one Note,
+    n6: one Note,
+    n7: one Note
 }
 
 -- Attributes necessary for a wellformed sequence of 8 notes
@@ -33,20 +33,20 @@ pred wellformed{
        scale.n1.value<=11 and scale.n1.value>=0
        scale.n2.value<=11 and scale.n2.value>=0
        scale.n3.value<=11 and scale.n3.value>=0
-    //   scale.n4.value<=11 and scale.n4.value>=0 // works with only 4 notes and this is commented out 
-    //    scale.n5.value<=11 and scale.n5.value>=0
-    //    scale.n6.value<=11 and scale.n6.value>=0
-    //    scale.n7.value<=11 and scale.n7.value>=0
+      scale.n4.value<=11 and scale.n4.value>=0 // works with only 4 notes and this is commented out 
+       scale.n5.value<=11 and scale.n5.value>=0
+       scale.n6.value<=11 and scale.n6.value>=0
+       scale.n7.value<=11 and scale.n7.value>=0
 
        scale.n0.next=scale.n1
        scale.n1.next=scale.n2
        scale.n2.next=scale.n3
-       scale.n3.next=none
+       scale.n3.next=scale.n4
 
-    //    scale.n4.next=scale.n5 // works with only 4 notes and this is commented out 
-    //    scale.n5.next=scale.n6
-    //    scale.n6.next=scale.n7
-    //    scale.n7.next= none
+       scale.n4.next=scale.n5 // works with only 4 notes and this is commented out 
+       scale.n5.next=scale.n6
+       scale.n6.next=scale.n7
+       scale.n7.next= none
 
     
  
@@ -56,10 +56,10 @@ pred wellformed{
         scale.n1=note1 or
         scale.n2=note1 or
         scale.n3=note1 or
-        // scale.n4=note1 or
-        // scale.n5=note1 or
-        // scale.n6=note1 or 
-        // scale.n7=note1
+        scale.n4=note1 or
+        scale.n5=note1 or
+        scale.n6=note1 or 
+        scale.n7=note1
 
         reachable[note1, note2, next] implies{
             note1!=note2  
@@ -71,7 +71,7 @@ pred wellformed{
 }
 // run{
 //     wellformed
-// } for 5 Int
+// } for 5 Int, exactly 8 Note
 -- Basic predicate to ensure two notes are a whole step apart
 pred wholeStep[firstNote, secondNote:Note]{
     add[firstNote.value,2]>11 implies{ // wrap around so that we stay within nums 0-11
@@ -97,10 +97,10 @@ pred majorScale{
             wholeStep[scale.n1, scale.n2]
             halfStep[scale.n2, scale.n3]
 
-            // wholeStep[scale.n3, scale.n4]
-            // wholeStep[scale.n4, scale.n5]
-            // wholeStep[scale.n5, scale.n6]
-            // halfStep[scale.n6, scale.n7]
+            wholeStep[scale.n3, scale.n4]
+            wholeStep[scale.n4, scale.n5]
+            wholeStep[scale.n5, scale.n6]
+            halfStep[scale.n6, scale.n7]
         }
     
     }
@@ -108,7 +108,7 @@ pred majorScale{
 run{
     wellformed
     majorScale
-} for 5 Int
+} for 5 Int, exactly 8 Note
 -- Scales can be minor
 // pred minorScale{
 //     --WHWWWWH
