@@ -79,19 +79,19 @@ run{
 -- Scales can be minor
 pred minorScale{
     --WHWWWWH
+    all scale:Scale, note: Int|{
     scale.note0=note implies {
         wholeStep[note, scale.note1]
-        halftep[scale.note1, scale.note2]
+        halfStep[scale.note1, scale.note2]
         wholeStep[scale.note2, scale.note3]
         wholeStep[scale.note3, scale.note4]
         wholeStep[scale.note4, scale.note5]
         wholeStep[scale.note5, scale.note6]
         halfStep[scale.note6, scale.note7]
     }
+    }
 
 }
 ----------------------------------------------------------------------------------------------------
 -- (1) Model the chords using the scales
 ----------------------------------------------------------------------------------------------------
-
-
