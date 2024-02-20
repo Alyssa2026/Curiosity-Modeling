@@ -1,4 +1,7 @@
 #lang forge/bsl
+
+option run_sterling "chords.js"
+
 ----------------------------------------------------------------------------------------------------
 -- (1) Model the scales used to create chords
 ----------------------------------------------------------------------------------------------------
@@ -18,8 +21,6 @@ one sig Scale {
     note5: one Int,
     note6: one Int,
     note7: one Int
-
-
 }
 
 -- Attributes necessary for a wellformed sequence of 8 notes
@@ -41,14 +42,14 @@ pred wellformed{
 //     wellformed
 // } for 5 Int
 pred wholeStep[firstNote, secondNote:Int]{
-    add[firstNote,2]>11 implies{
+    add[firstNote,2]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote= subtract[add[firstNote,2],12] 
     }else{
         secondNote= add[firstNote,2]
     }
 }
 pred halfStep[firstNote, secondNote:Int]{
-    add[firstNote,1]>11 implies{
+    add[firstNote,1]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote= subtract[add[firstNote,1],12] 
     }else{
         secondNote= add[firstNote,1]
