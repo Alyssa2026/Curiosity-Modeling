@@ -9,7 +9,7 @@
 sig Note {
     value: one Int,
     next: lone Note,
-    duration: one Int
+    beat: one Int
 }
 -- Scales are composed of 8 notes 
 one sig Scale {
@@ -23,7 +23,22 @@ one sig Scale {
     n6: one Note,
     n7: one Note
 }
+-- Chords are composed of 3 notes from a scale
+sig Chord{
+    root: one Note, 
+   	third: one Note,
+    fifth: one Note,
+    fourBeats: one Int
+}
+-- A 4 beat measure composed of a chord and 4 notes from scale
+// TODO: figre out how to bring everything together to make measure and simple tune!
+sig Measure{
+    
+}
+-- A simple tune composed of 4 measures
+one SimpleTune{
 
+}
 -- Attributes necessary for a wellformed sequence of 8 notes
     -- Each note must have values between 0-11 (notes a-g)
     -- The notes in the scale should not be the same
@@ -31,14 +46,14 @@ one sig Scale {
 pred wellformed{
     all scale:Scale|{
         // Create valid note values
-       scale.n0.value<=11 and scale.n1.value>=0
-       scale.n1.value<=11 and scale.n1.value>=0
-       scale.n2.value<=11 and scale.n2.value>=0
-       scale.n3.value<=11 and scale.n3.value>=0
-       scale.n4.value<=11 and scale.n4.value>=0  
-       scale.n5.value<=11 and scale.n5.value>=0
-       scale.n6.value<=11 and scale.n6.value>=0
-       scale.n7.value<=11 and scale.n7.value>=0
+       scale.n0.value<=11 and scale.n0.value>=0 and scale.n0.beat=1
+       scale.n1.value<=11 and scale.n1.value>=0 and scale.n1.beat=1
+       scale.n2.value<=11 and scale.n2.value>=0 and scale.n2.beat=1
+       scale.n3.value<=11 and scale.n3.value>=0 and scale.n3.beat=1
+       scale.n4.value<=11 and scale.n4.value>=0 and scale.n4.beat=1
+       scale.n5.value<=11 and scale.n5.value>=0 and scale.n5.beat=1
+       scale.n6.value<=11 and scale.n6.value>=0 and scale.n6.beat=1
+       scale.n7.value<=11 and scale.n7.value>=0 and scale.n7.beat=1
        // Create valid sequence
        scale.n0.next=scale.n1
        scale.n1.next=scale.n2
@@ -48,7 +63,6 @@ pred wellformed{
        scale.n5.next=scale.n6
        scale.n6.next=scale.n7
        scale.n7.next= none
- 
     }
     // Notes are distinct/ not themself
     some scale:Scale, note1, note2:Note|{
@@ -101,10 +115,10 @@ pred majorScale{
         }
     }
 }
-run{
-    wellformed
-    majorScale
-} for 5 Int, exactly 8 Note
+// run{
+//     wellformed
+//     majorScale
+// } for 5 Int, exactly 8 Note
 -- Scales can be minor
 pred minorScale{
     --WHWWWWH
@@ -119,21 +133,47 @@ pred minorScale{
             halfStep[scale.n6, scale.n7]
         }
     }
-
  }
 ----------------------------------------------------------------------------------------------------
 -- (2) Model the chords using the scales
 ----------------------------------------------------------------------------------------------------
-pred majorFirstChord{
-    
+pred wellformedChord{
+    all chord:Chord|{
+        chord.fourBeats=4
+    }
 }
-
-pred majorThirdChord{
-    
+pred tonicChord{
+    all scale:Scale|{
+        one tonic:Chord|{ // unsure about quantity, one might work if we split into measures?
+            tonic.root=scale.n0
+            tonic.third=scale.n2
+            tonic.fifth=scale.n4
+        }
+    }
 }
-
-pred majorFifthChord{
-    
+run{
+    wellformed
+    majorScale
+    wellformedChord
+    tonicChord
+} for 5 Int, exactly 8 Note
+pred subdominantChord{
+    all scale:Scale|{
+        one subdominant:Chord|{
+            subdominant.root=scale.n0
+            subdominant.third=scale.n3
+            subdominant.fifth=scale.n5
+        }
+    }
+}
+pred dominantChord{
+    all scale:Scale|{
+        one dominant:Chord|{
+            dominant.root=scale.n6
+            dominant.third=scale.n1
+            dominant.fifth=scale.n4
+        }
+    }
 }
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
