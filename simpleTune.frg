@@ -29,26 +29,24 @@ one sig Scale {
     -- Each note points to a next note or none
 pred wellformed{
     all scale:Scale|{
+       // TODO: Is there a way to do this better and more efficiently?
        scale.n0.value<=11 and scale.n1.value>=0
        scale.n1.value<=11 and scale.n1.value>=0
        scale.n2.value<=11 and scale.n2.value>=0
        scale.n3.value<=11 and scale.n3.value>=0
-      scale.n4.value<=11 and scale.n4.value>=0 // works with only 4 notes and this is commented out 
+       scale.n4.value<=11 and scale.n4.value>=0  
        scale.n5.value<=11 and scale.n5.value>=0
        scale.n6.value<=11 and scale.n6.value>=0
        scale.n7.value<=11 and scale.n7.value>=0
-
+        // TODO: Is there a way to do this better and more efficiently?
        scale.n0.next=scale.n1
        scale.n1.next=scale.n2
        scale.n2.next=scale.n3
        scale.n3.next=scale.n4
-
-       scale.n4.next=scale.n5 // works with only 4 notes and this is commented out 
+       scale.n4.next=scale.n5
        scale.n5.next=scale.n6
        scale.n6.next=scale.n7
        scale.n7.next= none
-
-    
  
     }
     some scale:Scale, note1, note2:Note|{
@@ -96,7 +94,6 @@ pred majorScale{
             wholeStep[note, scale.n1]
             wholeStep[scale.n1, scale.n2]
             halfStep[scale.n2, scale.n3]
-
             wholeStep[scale.n3, scale.n4]
             wholeStep[scale.n4, scale.n5]
             wholeStep[scale.n5, scale.n6]
@@ -110,21 +107,27 @@ run{
     majorScale
 } for 5 Int, exactly 8 Note
 -- Scales can be minor
-// pred minorScale{
-//     --WHWWWWH
-//     all scale:Scale, note: Note|{
-//     scale.n0=note implies {
-//         wholeStep[note, scale.n1]
-//         halfStep[scale.n1, scale.n2]
-//         wholeStep[scale.n2, scale.n3]
-//         wholeStep[scale.n3, scale.n4]
-//         wholeStep[scale.n4, scale.n5]
-//         wholeStep[scale.n5, scale.n6]
-//         halfStep[scale.n6, scale.n7]
-//     }
-//     }
+pred minorScale{
+    --WHWWWWH
+    all scale:Scale, note: Note|{
+    scale.n0=note implies {
+        wholeStep[note, scale.n1]
+        halfStep[scale.n1, scale.n2]
+        wholeStep[scale.n2, scale.n3]
+        wholeStep[scale.n3, scale.n4]
+        wholeStep[scale.n4, scale.n5]
+        wholeStep[scale.n5, scale.n6]
+        halfStep[scale.n6, scale.n7]
+    }
+    }
 
-//  }
-// ----------------------------------------------------------------------------------------------------
-// -- (1) Model the chords using the scales
-// ----------------------------------------------------------------------------------------------------
+ }
+----------------------------------------------------------------------------------------------------
+-- (2) Model the chords using the scales
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+-- (3) Model a simple 5 measure tune with the chords and scales
+----------------------------------------------------------------------------------------------------
+
