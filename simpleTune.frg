@@ -33,12 +33,21 @@ sig Chord{
 }
 -- A 4 beat measure composed of a chord and 4 notes from scale
 // TODO: figre out how to bring everything together to make measure and simple tune!
-sig Measure{
-    
+sig Melody{
+    // Initialize notes
+    m0: one Note, 
+   	m1: one Note,
+    m2: one Note,
+   	m3: one Note,
+    m4: one Note,
+    m5: one Note,
+    m6: one Note,
+    m7: one Note
 }
 -- A simple tune composed of 4 measures
 one sig SimpleTune{
-
+    melody: one Melody, 
+    bass: one ChordProgression
 }
 
 one sig ChordProgression {
@@ -192,10 +201,6 @@ pred dominantChord[dominant: Chord]{
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
-pred simpleTune{
-    
-}
-
 pred wellformedChordProg {
     one scale: Scale | {
         one chordProg: ChordProgression | {
@@ -210,43 +215,82 @@ pred wellformedChordProg {
             chordProg.c2.chordNext = chordProg.c3
             chordProg.c3.chordNext = chordProg.c4
             chordProg.c4.chordNext = none
+        }
+        some chordProg:ChordProgression, chord1, chord2:Chord|{
+            chordProg.c0=chord1 or 
+            chordProg.c1=chord1 or 
+            chordProg.c2=chord1 or 
+            chordProg.c3=chord1 or 
+            chordProg.c4=chord1
 
-   some chordProg:ChordProgression, chord1, chord2:Chord|{
-        chordProg.c0=chord1 or 
-        chordProg.c1=chord1 or 
-        chordProg.c2=chord1 or 
-        chordProg.c3=chord1 or 
-        chordProg.c4=chord1
+
+            reachable[chord1, chord2, chordNext] implies{
+                chord1!=chord2  
+            } or 
+            reachable[chord2, chord1, chordNext] implies {
+                chord1!=chord2
+            }
+        }
+    }
+}
 
 
-        reachable[chord1, chord2, chordNext] implies{
-            chord1!=chord2  
+// run{
+//     wellformed
+//     majorScale
+//     wellformedChord
+//     wellformedChordProg
+// } for 5 Int, exactly 8 Note, exactly 5 Chord
+
+pred createMelody{
+    all scale:Scale|{
+        // Create valid note values
+       scale.n0.value<=11 and scale.n0.value>=0 and scale.n0.beat=1
+       scale.n1.value<=11 and scale.n1.value>=0 and scale.n1.beat=1
+       scale.n2.value<=11 and scale.n2.value>=0 and scale.n2.beat=1
+       scale.n3.value<=11 and scale.n3.value>=0 and scale.n3.beat=1
+       scale.n4.value<=11 and scale.n4.value>=0 and scale.n4.beat=1
+       scale.n5.value<=11 and scale.n5.value>=0 and scale.n5.beat=1
+       scale.n6.value<=11 and scale.n6.value>=0 and scale.n6.beat=1
+       scale.n7.value<=11 and scale.n7.value>=0 and scale.n7.beat=1
+       // Create valid sequence
+       scale.n0.next=scale.n1
+       scale.n1.next=scale.n2
+       scale.n2.next=scale.n3
+       scale.n3.next=scale.n4
+       scale.n4.next=scale.n5
+       scale.n5.next=scale.n6
+       scale.n6.next=scale.n7
+       scale.n7.next= none
+    }
+    // Notes are distinct/ not themself
+    some scale:Scale, note1, note2:Note|{
+        scale.n0=note1 or 
+        scale.n1=note1 or
+        scale.n2=note1 or
+        scale.n3=note1 or
+        scale.n4=note1 or
+        scale.n5=note1 or
+        scale.n6=note1 or 
+        scale.n7=note1
+        reachable[note1, note2, next] implies{
+            note1!=note2  
         } or 
-        reachable[chord2, chord1, chordNext] implies {
-             chord1!=chord2
+        reachable[note2, note1, next] implies {
+             note1!=note2
         }
     }
-         
-
+}
+pred simpleTune{
+    one scale:Scale|{
+        one chordProg:ChordProgression|{
+            one mel: Melody|{
+                one simpleTune:SimpleTune|{
+                    simpleTune.melody=mel
+                    simpleTune.bass= chordProg
+                }
+            }
+            
         }
     }
-    }
-
-            // tonicChord[ton1]
-            // tonicChord[ton2]
-            // tonicChord[ton3]
-            // subdominantChord[sub]
-            // dominantChord[dom]
-            // ton1.chordNext = sub
-            // sub.chordNext = ton2
-            // ton2.chordNext = dom
-            // dom.chordNext = ton3
-        
-    
-
-run{
-    wellformed
-    majorScale
-    wellformedChord
-    wellformedChordProg
-} for 5 Int, exactly 8 Note, exactly 5 Chord
+}
