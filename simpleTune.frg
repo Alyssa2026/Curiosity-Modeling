@@ -93,7 +93,7 @@ pred wellformed{
        scale.n6.next=scale.n7
        scale.n7.next= none
     }
-    // Notes are distinct/ not themself
+    // Ensure notes are distinct and dont equal and point to themself
     some scale:Scale, note1, note2:Note|{
         scale.n0=note1 or 
         scale.n1=note1 or
@@ -111,9 +111,6 @@ pred wellformed{
         }
     }
 }
-// run{
-//     wellformed
-// } for 5 Int, exactly 8 Note
 -- Basic predicate to create two notes a whole step apart
 pred wholeStep[firstNote, secondNote:Note]{
     add[firstNote.value,2]>11 implies{ // wrap around so that we stay within nums 0-11
@@ -132,7 +129,7 @@ pred halfStep[firstNote, secondNote:Note]{
 }
 -- Predicate to create a major scale
 pred majorScale{
-    --WWHWWWH
+    -- major scale follows WWHWWWH
     all scale:Scale, note: Note|{
         scale.n0=note implies {
             wholeStep[note, scale.n1]
@@ -145,13 +142,8 @@ pred majorScale{
         }
     }
 }
-// run{
-//     wellformed
-//     majorScale
-// } for 5 Int, exactly 8 Note
--- Predicate to create a minor scale
 pred minorScale{
-    --WHWWWWH
+    -- minor scale follows WHWWWWH
     all scale:Scale, note: Note|{
         scale.n0=note implies {
             wholeStep[note, scale.n1]
@@ -164,14 +156,22 @@ pred minorScale{
         }
     }
  }
+ // run{
+//     wellformed
+//     majorScale
+// } for 5 Int, exactly 8 Note
+-- Predicate to create a minor scale
 ----------------------------------------------------------------------------------------------------
 -- (2) Model the chords using the scales
 ----------------------------------------------------------------------------------------------------
+-- Create a well formed chord
+    -- For this tune, it must be 2 beats long
 pred wellformedChord{
     all chord:Chord|{
-        chord.twoBeats=2
+        chord.twoBeats=2 // NEED TO FIX
     }
 }
+-- Creating a tonic chord
 pred tonicChord[tonic: Chord] {
     all scale:Scale|{
         tonic.root=scale.n0
@@ -179,12 +179,7 @@ pred tonicChord[tonic: Chord] {
         tonic.fifth=scale.n4
     }
 }
-// run{
-//     wellformed
-//     majorScale
-//     wellformedChord
-//     tonicChord
-// } for 5 Int, exactly 8 Note
+-- Creating a subdominant chord
 pred subdominantChord[subdominant: Chord]{
     all scale:Scale|{
         subdominant.root=scale.n0
@@ -192,6 +187,7 @@ pred subdominantChord[subdominant: Chord]{
         subdominant.fifth=scale.n5
     }
 }
+-- creating a dominant chord
 pred dominantChord[dominant: Chord]{
     all scale:Scale| {
         dominant.root=scale.n6
@@ -199,7 +195,6 @@ pred dominantChord[dominant: Chord]{
         dominant.fifth=scale.n4
     }
 }
-
 // run{
 //     wellformed
 //     majorScale
@@ -211,6 +206,7 @@ pred dominantChord[dominant: Chord]{
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
+-- Helper to set a note in melody to a random note within the scale
 pred createRandomNote[melodyNote: Note] {
     all scale: Scale | {
         some note1: Note | {
@@ -219,9 +215,12 @@ pred createRandomNote[melodyNote: Note] {
         }
     }
 }
+-- Creates teh melody by assigning each note to a random note within the scale
+    -- Ensures the notes point to next correctly
 pred createMelody{
     all scale:Scale|{
         one mel: Melody | {
+            // Assign random note within scale
             createRandomNote[mel.m0] and mel.m0.beat = 1
             createRandomNote[mel.m1] and mel.m1.beat = 1
             createRandomNote[mel.m2] and mel.m2.beat = 1
@@ -233,20 +232,19 @@ pred createMelody{
             createRandomNote[mel.m8] and mel.m8.beat = 1
             createRandomNote[mel.m9] and mel.m9.beat = 1
             // Create valid sequence
-       mel.m0.next=mel.m1
-       mel.m1.next=mel.m2
-       mel.m2.next=mel.m3
-       mel.m3.next=mel.m4
-       mel.m4.next=mel.m5
-       mel.m5.next=mel.m6
-       mel.m6.next=mel.m7
-       mel.m7.next=mel.m8
-       mel.m8.next=mel.m9
-       mel.m9.next= none
+            mel.m0.next=mel.m1
+            mel.m1.next=mel.m2
+            mel.m2.next=mel.m3
+            mel.m3.next=mel.m4
+            mel.m4.next=mel.m5
+            mel.m5.next=mel.m6
+            mel.m6.next=mel.m7
+            mel.m7.next=mel.m8
+            mel.m8.next=mel.m9
+            mel.m9.next= none
+        }
     }
-   
-    }
-    // Notes are distinct/ not themself
+    // Notes are distinct/not themself
     some mel:Melody, note1, note2:Note|{
         mel.m0=note1 or 
         mel.m1=note1 or
@@ -267,8 +265,10 @@ pred createMelody{
         }
     }
 }
+-- Creating a well formed chord progression that will be the bass
 pred wellformedChordProg {
     one scale: Scale | {
+        // Create the correct sequance of chords to act as bass
         one chordProg: ChordProgression | {
             tonicChord[chordProg.c0]
             subdominantChord[chordProg.c1]
@@ -282,13 +282,13 @@ pred wellformedChordProg {
             chordProg.c3.chordNext = chordProg.c4
             chordProg.c4.chordNext = none
         }
+        // Ensure chords dont equal each other 
         some chordProg:ChordProgression, chord1, chord2:Chord|{
             chordProg.c0=chord1 or 
             chordProg.c1=chord1 or 
             chordProg.c2=chord1 or 
             chordProg.c3=chord1 or 
             chordProg.c4=chord1
-
 
             reachable[chord1, chord2, chordNext] implies{
                 chord1!=chord2  
@@ -299,13 +299,14 @@ pred wellformedChordProg {
         }
     }
 }
+-- Putting everything together to create a simple 5 measure simple tune!
 pred simpleTune{
     one scale:Scale|{
         one chordProg:ChordProgression|{
             one mel: Melody|{
                 one simpleTune:SimpleTune|{
-                    simpleTune.melody=mel
-                    simpleTune.bass= chordProg
+                    simpleTune.melody=mel // melody 
+                    simpleTune.bass= chordProg // bass
                 }
             }
             
