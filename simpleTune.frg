@@ -3,15 +3,19 @@
 option run_sterling "simpleTune.js"
 
 ----------------------------------------------------------------------------------------------------
--- (1) Model the scales used to create chords
+-- Create all the necessary objects for a simple tune
 ----------------------------------------------------------------------------------------------------
--- Scales are made up of notes
+-- This represents a note which is the building blocks of a simple tune. 
+    -- Value represents the note pitch (a-g)
+    -- Next is a pointer to the next note that follows the current note (ensures notes are played sequentially)
+    -- Beat represents the duration a note lasts
 sig Note {
     value: one Int,
     next: lone Note,
     beat: one Int
 }
--- Scales are composed of 8 notes 
+-- Scales are composed of 8 notes. It establishses the set of 8 notes that can be used to create a simple tune.
+    -- n0-n7 are the 8 notes contained in a scale
 one sig Scale {
     // Initialize notes
     n0: one Note, 
@@ -24,17 +28,18 @@ one sig Scale {
     n7: one Note
 }
 -- Chords are composed of 3 notes from a scale
+    -- root-fifth are the 3 notes in a chord
+    -- Next is a pointer to the next chord that follows the current note (ensures chords are played sequentially)
 sig Chord{
     root: one Note, 
    	third: one Note,
     fifth: one Note,
     chordNext: lone Chord,
-    twoBeats: one Int
+    twoBeats: one Int // NEED TO CHAGE
 }
--- A 4 beat measure composed of a chord and 4 notes from scale
-// TODO: figre out how to bring everything together to make measure and simple tune!
+-- A simple tune needs a melody
+    -- m0-m9 are the 10 notes in a melody
 one sig Melody{
-    // Initialize notes
     m0: one Note, 
    	m1: one Note,
     m2: one Note,
@@ -46,12 +51,8 @@ one sig Melody{
     m8: one Note,
     m9: one Note
 }
--- A simple tune composed of 4 measures
-one sig SimpleTune{
-    melody: one Melody, 
-    bass: one ChordProgression
-}
-
+-- A simple tune needs a bass whihc are made of chord progressions in this case
+    -- c0-c4 are the 4 chords in a melody
 one sig ChordProgression {
     c0: one Chord,
     c1: one Chord,
@@ -59,6 +60,14 @@ one sig ChordProgression {
     c3: one Chord,
     c4: one Chord
 }
+-- A simple tune composed of a melody and bass (chord progression)
+one sig SimpleTune{
+    melody: one Melody, 
+    bass: one ChordProgression
+}
+----------------------------------------------------------------------------------------------------
+-- (1) Create a basic valid scale (major or minor)
+----------------------------------------------------------------------------------------------------
 -- Attributes necessary for a wellformed sequence of 8 notes
     -- Each note must have values between 0-11 (notes a-g)
     -- The notes in the scale should not be the same
@@ -105,7 +114,7 @@ pred wellformed{
 // run{
 //     wellformed
 // } for 5 Int, exactly 8 Note
--- Basic predicate to ensure two notes are a whole step apart
+-- Basic predicate to create two notes a whole step apart
 pred wholeStep[firstNote, secondNote:Note]{
     add[firstNote.value,2]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote.value= subtract[add[firstNote.value,2],12] 
@@ -113,6 +122,7 @@ pred wholeStep[firstNote, secondNote:Note]{
         secondNote.value= add[firstNote.value,2]
     }
 }
+-- Basic predicate to create two notes a half step apart
 pred halfStep[firstNote, secondNote:Note]{
     add[firstNote.value,1]>11 implies{ // wrap around so that we stay within nums 0-11
         secondNote.value= subtract[add[firstNote.value,1],12] 
@@ -120,7 +130,7 @@ pred halfStep[firstNote, secondNote:Note]{
         secondNote.value= add[firstNote.value,1]
     }
 }
--- Scales can be major 
+-- Predicate to create a major scale
 pred majorScale{
     --WWHWWWH
     all scale:Scale, note: Note|{
@@ -139,7 +149,7 @@ pred majorScale{
 //     wellformed
 //     majorScale
 // } for 5 Int, exactly 8 Note
--- Scales can be minor
+-- Predicate to create a minor scale
 pred minorScale{
     --WHWWWWH
     all scale:Scale, note: Note|{
@@ -182,8 +192,6 @@ pred subdominantChord[subdominant: Chord]{
         subdominant.fifth=scale.n5
     }
 }
-
-
 pred dominantChord[dominant: Chord]{
     all scale:Scale| {
         dominant.root=scale.n6
@@ -203,40 +211,6 @@ pred dominantChord[dominant: Chord]{
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
-pred wellformedChordProg {
-    one scale: Scale | {
-        one chordProg: ChordProgression | {
-            tonicChord[chordProg.c0]
-            subdominantChord[chordProg.c1]
-            tonicChord[chordProg.c2]
-            dominantChord[chordProg.c3]
-            tonicChord[chordProg.c4]
-
-            chordProg.c0.chordNext = chordProg.c1
-            chordProg.c1.chordNext = chordProg.c2
-            chordProg.c2.chordNext = chordProg.c3
-            chordProg.c3.chordNext = chordProg.c4
-            chordProg.c4.chordNext = none
-        }
-        some chordProg:ChordProgression, chord1, chord2:Chord|{
-            chordProg.c0=chord1 or 
-            chordProg.c1=chord1 or 
-            chordProg.c2=chord1 or 
-            chordProg.c3=chord1 or 
-            chordProg.c4=chord1
-
-
-            reachable[chord1, chord2, chordNext] implies{
-                chord1!=chord2  
-            } or 
-            reachable[chord2, chord1, chordNext] implies {
-                chord1!=chord2
-            }
-        }
-    }
-}
-
-
 pred createRandomNote[melodyNote: Note] {
     all scale: Scale | {
         some note1: Note | {
@@ -245,7 +219,6 @@ pred createRandomNote[melodyNote: Note] {
         }
     }
 }
-
 pred createMelody{
     all scale:Scale|{
         one mel: Melody | {
@@ -294,6 +267,38 @@ pred createMelody{
         }
     }
 }
+pred wellformedChordProg {
+    one scale: Scale | {
+        one chordProg: ChordProgression | {
+            tonicChord[chordProg.c0]
+            subdominantChord[chordProg.c1]
+            tonicChord[chordProg.c2]
+            dominantChord[chordProg.c3]
+            tonicChord[chordProg.c4]
+
+            chordProg.c0.chordNext = chordProg.c1
+            chordProg.c1.chordNext = chordProg.c2
+            chordProg.c2.chordNext = chordProg.c3
+            chordProg.c3.chordNext = chordProg.c4
+            chordProg.c4.chordNext = none
+        }
+        some chordProg:ChordProgression, chord1, chord2:Chord|{
+            chordProg.c0=chord1 or 
+            chordProg.c1=chord1 or 
+            chordProg.c2=chord1 or 
+            chordProg.c3=chord1 or 
+            chordProg.c4=chord1
+
+
+            reachable[chord1, chord2, chordNext] implies{
+                chord1!=chord2  
+            } or 
+            reachable[chord2, chord1, chordNext] implies {
+                chord1!=chord2
+            }
+        }
+    }
+}
 pred simpleTune{
     one scale:Scale|{
         one chordProg:ChordProgression|{
@@ -307,8 +312,6 @@ pred simpleTune{
         }
     }
 }
-
-
 run{
     wellformed
     majorScale
