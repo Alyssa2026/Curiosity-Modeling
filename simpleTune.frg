@@ -1,6 +1,6 @@
 #lang forge/bsl
 
-option run_sterling "scales.js"
+option run_sterling "simpleTune.js"
 
 ----------------------------------------------------------------------------------------------------
 -- (1) Model the scales used to create chords

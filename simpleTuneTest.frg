@@ -1,2 +1,2 @@
 -- Load the visualization script
-option run_sterling "chords.js"
+option run_sterling "simpleTune.js"
