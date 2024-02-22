@@ -197,23 +197,41 @@ pred simpleTune{
 }
 
 pred wellformedChordProg {
-    one scale: Scale implies {
+    one scale: Scale | {
         one chordProg: ChordProgression | {
             tonicChord[chordProg.c1]
-            subdominant[chordProg.c2]
+            subdominantChord[chordProg.c2]
             tonicChord[chordProg.c3]
             dominantChord[chordProg.c4]
             tonicChord[chordProg.c5]
 
-            chordProg.c1.next = chordProg.c2
-            chordProg.c2.next = chordProg.c3
-            chordProg.c3.next = chordProg.c4
-            chordProg.c4.next = chordProg.c5
-            chordProg.c5.next = none
+            chordProg.c1.chordNext = chordProg.c2
+            chordProg.c2.chordNext = chordProg.c3
+            chordProg.c3.chordNext = chordProg.c4
+            chordProg.c4.chordNext = chordProg.c5
+            chordProg.c5.chordNext = none
+
+
+   some chordProg:ChordProgression, chord1, chord2:Chord|{
+        chordProg.c1=chord1 or 
+        chordProg.c2=chord1 or 
+        chordProg.c3=chord1 or 
+        chordProg.c4=chord1 or 
+        chordProg.c5=chord1
+
+
+        reachable[chord1, chord2, chordNext] implies{
+            chord1!=chord2  
+        } or 
+        reachable[chord2, chord1, chordNext] implies {
+             chord1!=chord2
+        }
+    }
+         
 
         }
     }
-   // }
+    }
 
             // tonicChord[ton1]
             // tonicChord[ton2]
@@ -226,10 +244,10 @@ pred wellformedChordProg {
             // dom.chordNext = ton3
         
     
-}
+
 run{
     wellformed
     majorScale
     wellformedChord
-    wellformedChordProgression
+    wellformedChordProg
 } for 5 Int, exactly 8 Note
