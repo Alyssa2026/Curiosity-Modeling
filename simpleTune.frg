@@ -28,6 +28,7 @@ sig Chord{
     root: one Note, 
    	third: one Note,
     fifth: one Note,
+    chordNext: lone Chord,
     fourBeats: one Int
 }
 -- A 4 beat measure composed of a chord and 4 notes from scale
@@ -38,6 +39,14 @@ sig Measure{
 -- A simple tune composed of 4 measures
 one sig SimpleTune{
 
+}
+
+one sig ChordProgression {
+    c1: one Chord,
+    c2: one Chord,
+    c3: one Chord,
+    c4: one Chord,
+    c5: one Chord
 }
 -- Attributes necessary for a wellformed sequence of 8 notes
     -- Each note must have values between 0-11 (notes a-g)
@@ -142,13 +151,11 @@ pred wellformedChord{
         chord.fourBeats=4
     }
 }
-pred tonicChord{
+pred tonicChord[tonic: Chord] {
     all scale:Scale|{
-        some tonic:Chord|{ // unsure about quantity, one might work if we split into measures?
-            tonic.root=scale.n0
-            tonic.third=scale.n2
-            tonic.fifth=scale.n4
-        }
+        tonic.root=scale.n0
+        tonic.third=scale.n2
+        tonic.fifth=scale.n4
     }
 }
 // run{
@@ -157,38 +164,72 @@ pred tonicChord{
 //     wellformedChord
 //     tonicChord
 // } for 5 Int, exactly 8 Note
-pred subdominantChord{
+pred subdominantChord[subdominant: Chord]{
     all scale:Scale|{
-        some subdominant:Chord|{
-            subdominant.root=scale.n0
-            subdominant.third=scale.n3
-            subdominant.fifth=scale.n5
-        }
+        subdominant.root=scale.n0
+        subdominant.third=scale.n3
+        subdominant.fifth=scale.n5
     }
 }
 
 
-pred dominantChord{
-    all scale:Scale|{
-        one dominant:Chord|{
-            dominant.root=scale.n6
-            dominant.third=scale.n1
-            dominant.fifth=scale.n4
-        }
+pred dominantChord[dominant: Chord]{
+    all scale:Scale| {
+        dominant.root=scale.n6
+        dominant.third=scale.n1
+        dominant.fifth=scale.n4
     }
 }
 
-run{
-    wellformed
-    majorScale
-    wellformedChord
-    tonicChord
-    subdominantChord
-    dominantChord
-} for 5 Int, exactly 8 Note
+// run{
+//     wellformed
+//     majorScale
+//     wellformedChord
+//     tonicChord
+//     subdominantChord
+//     dominantChord
+// } for 5 Int, exactly 8 Note
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
 pred simpleTune{
     
 }
+
+pred wellformedChordProg {
+    one scale: Scale implies {
+        one chordProg: ChordProgression | {
+            tonicChord[chordProg.c1]
+            subdominant[chordProg.c2]
+            tonicChord[chordProg.c3]
+            dominantChord[chordProg.c4]
+            tonicChord[chordProg.c5]
+
+            chordProg.c1.next = chordProg.c2
+            chordProg.c2.next = chordProg.c3
+            chordProg.c3.next = chordProg.c4
+            chordProg.c4.next = chordProg.c5
+            chordProg.c5.next = none
+
+        }
+    }
+   // }
+
+            // tonicChord[ton1]
+            // tonicChord[ton2]
+            // tonicChord[ton3]
+            // subdominantChord[sub]
+            // dominantChord[dom]
+            // ton1.chordNext = sub
+            // sub.chordNext = ton2
+            // ton2.chordNext = dom
+            // dom.chordNext = ton3
+        
+    
+}
+run{
+    wellformed
+    majorScale
+    wellformedChord
+    wellformedChordProgression
+} for 5 Int, exactly 8 Note
