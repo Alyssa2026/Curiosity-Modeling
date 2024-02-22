@@ -240,9 +240,8 @@ pred wellformedChordProg {
 pred createRandomNote[melodyNote: Note] {
     all scale: Scale | {
         some note1: Note | {
-            (reachable[note1, scale.n0, next] or note1 = scale.n0) implies {
+            (reachable[note1, scale.n0, next] or note1 = scale.n0)
                 melodyNote.value = note1.value
-            }
         }
     }
 }
@@ -251,15 +250,15 @@ pred createMelody{
     all scale:Scale|{
         one mel: Melody | {
             createRandomNote[mel.m0] and mel.m0.beat = 1
-            createRandomNote[mel.m1] and mel.m0.beat = 1
-            createRandomNote[mel.m2] and mel.m0.beat = 1
-            createRandomNote[mel.m3] and mel.m0.beat = 1
-            createRandomNote[mel.m4] and mel.m0.beat = 1
-            createRandomNote[mel.m5] and mel.m0.beat = 1
-            createRandomNote[mel.m6] and mel.m0.beat = 1
-            createRandomNote[mel.m7] and mel.m0.beat = 1
-            createRandomNote[mel.m8] and mel.m0.beat = 1
-            createRandomNote[mel.m9] and mel.m0.beat = 1
+            createRandomNote[mel.m1] and mel.m1.beat = 1
+            createRandomNote[mel.m2] and mel.m2.beat = 1
+            createRandomNote[mel.m3] and mel.m3.beat = 1
+            createRandomNote[mel.m4] and mel.m4.beat = 1
+            createRandomNote[mel.m5] and mel.m5.beat = 1
+            createRandomNote[mel.m6] and mel.m6.beat = 1
+            createRandomNote[mel.m7] and mel.m7.beat = 1
+            createRandomNote[mel.m8] and mel.m8.beat = 1
+            createRandomNote[mel.m9] and mel.m9.beat = 1
             // Create valid sequence
        mel.m0.next=mel.m1
        mel.m1.next=mel.m2
