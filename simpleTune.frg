@@ -42,11 +42,11 @@ one sig SimpleTune{
 }
 
 one sig ChordProgression {
+    c0: one Chord,
     c1: one Chord,
     c2: one Chord,
     c3: one Chord,
-    c4: one Chord,
-    c5: one Chord
+    c4: one Chord
 }
 -- Attributes necessary for a wellformed sequence of 8 notes
     -- Each note must have values between 0-11 (notes a-g)
@@ -199,25 +199,24 @@ pred simpleTune{
 pred wellformedChordProg {
     one scale: Scale | {
         one chordProg: ChordProgression | {
-            tonicChord[chordProg.c1]
-            subdominantChord[chordProg.c2]
-            tonicChord[chordProg.c3]
-            dominantChord[chordProg.c4]
-            tonicChord[chordProg.c5]
+            tonicChord[chordProg.c0]
+            subdominantChord[chordProg.c1]
+            tonicChord[chordProg.c2]
+            dominantChord[chordProg.c3]
+            tonicChord[chordProg.c4]
 
+            chordProg.c0.chordNext = chordProg.c1
             chordProg.c1.chordNext = chordProg.c2
             chordProg.c2.chordNext = chordProg.c3
             chordProg.c3.chordNext = chordProg.c4
-            chordProg.c4.chordNext = chordProg.c5
-            chordProg.c5.chordNext = none
-
+            chordProg.c4.chordNext = none
 
    some chordProg:ChordProgression, chord1, chord2:Chord|{
+        chordProg.c0=chord1 or 
         chordProg.c1=chord1 or 
         chordProg.c2=chord1 or 
         chordProg.c3=chord1 or 
-        chordProg.c4=chord1 or 
-        chordProg.c5=chord1
+        chordProg.c4=chord1
 
 
         reachable[chord1, chord2, chordNext] implies{
@@ -250,4 +249,4 @@ run{
     majorScale
     wellformedChord
     wellformedChordProg
-} for 5 Int, exactly 8 Note
+} for 5 Int, exactly 8 Note, exactly 5 Chord

@@ -41,6 +41,14 @@ const scale = [
   Scale.n7,
 ];
 
+const chordProg = [
+  ChordProgression.c0,
+  ChordProgression.c1,
+  ChordProgression.c2,
+  ChordProgression.c3,
+  ChordProgression.c4
+];
+
 const chords = Chord.tuples().map((ltup) => ltup);
 
 const tonicChord = [Chord.root, Chord.third, Chord.fifth];
@@ -69,6 +77,30 @@ scale.forEach((note, idx) => {
     { x: idx, y: 2 },
     new TextBox({
       text: `${numberToNote(parseInt(Object.values(note.value)))}`,
+    })
+  );
+});
+
+
+const chordProgGridConfig = {
+  // Absolute location in parent (here, of the stage itself)
+  grid_location: { x: 20, y: 400 },
+  // How large is each cell?
+  cell_size: { x_size: 70, y_size: 55 },
+  // How many rows and columns?
+  grid_dimensions: { y_size: 3, x_size: 5 },
+};
+
+const chordProgGrid = new Grid(chordProgGridConfig);
+
+// Populate solution numbers
+chordProg.forEach((chord, idx) => {
+  chordProgGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Chord ${idx}` }));
+  chordProgGrid.add({ x: idx, y: 1 }, new TextBox({ text: `${chord.root}` }));
+  chordProgGrid.add(
+    { x: idx, y: 2 },
+    new TextBox({
+      text: `${numberToNote(parseInt(Object.values(chord.root.value)))}`,
     })
   );
 });
@@ -178,4 +210,5 @@ stage.add(scaleGrid);
 stage.add(tonicChordGrid);
 stage.add(subdomChordGrid);
 stage.add(domChordGrid);
+stage.add(chordProgGrid);
 stage.render(svg);
