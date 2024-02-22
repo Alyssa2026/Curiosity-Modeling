@@ -1,6 +1,6 @@
 #lang forge/bsl
 
-//option run_sterling "chords.js"
+option run_sterling "scales.js"
 
 ----------------------------------------------------------------------------------------------------
 -- (1) Model the scales used to create chords
@@ -36,7 +36,7 @@ sig Measure{
     
 }
 -- A simple tune composed of 4 measures
-one SimpleTune{
+one sig SimpleTune{
 
 }
 -- Attributes necessary for a wellformed sequence of 8 notes
@@ -144,28 +144,30 @@ pred wellformedChord{
 }
 pred tonicChord{
     all scale:Scale|{
-        one tonic:Chord|{ // unsure about quantity, one might work if we split into measures?
+        some tonic:Chord|{ // unsure about quantity, one might work if we split into measures?
             tonic.root=scale.n0
             tonic.third=scale.n2
             tonic.fifth=scale.n4
         }
     }
 }
-run{
-    wellformed
-    majorScale
-    wellformedChord
-    tonicChord
-} for 5 Int, exactly 8 Note
+// run{
+//     wellformed
+//     majorScale
+//     wellformedChord
+//     tonicChord
+// } for 5 Int, exactly 8 Note
 pred subdominantChord{
     all scale:Scale|{
-        one subdominant:Chord|{
+        some subdominant:Chord|{
             subdominant.root=scale.n0
             subdominant.third=scale.n3
             subdominant.fifth=scale.n5
         }
     }
 }
+
+
 pred dominantChord{
     all scale:Scale|{
         one dominant:Chord|{
@@ -175,6 +177,15 @@ pred dominantChord{
         }
     }
 }
+
+run{
+    wellformed
+    majorScale
+    wellformedChord
+    tonicChord
+    subdominantChord
+    dominantChord
+} for 5 Int, exactly 8 Note
 ----------------------------------------------------------------------------------------------------
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
