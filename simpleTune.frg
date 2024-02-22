@@ -29,11 +29,11 @@ sig Chord{
    	third: one Note,
     fifth: one Note,
     chordNext: lone Chord,
-    fourBeats: one Int
+    twoBeats: one Int
 }
 -- A 4 beat measure composed of a chord and 4 notes from scale
 // TODO: figre out how to bring everything together to make measure and simple tune!
-sig Melody{
+one sig Melody{
     // Initialize notes
     m0: one Note, 
    	m1: one Note,
@@ -42,7 +42,9 @@ sig Melody{
     m4: one Note,
     m5: one Note,
     m6: one Note,
-    m7: one Note
+    m7: one Note,
+    m8: one Note,
+    m9: one Note
 }
 -- A simple tune composed of 4 measures
 one sig SimpleTune{
@@ -157,7 +159,7 @@ pred minorScale{
 ----------------------------------------------------------------------------------------------------
 pred wellformedChord{
     all chord:Chord|{
-        chord.fourBeats=4
+        chord.twoBeats=2
     }
 }
 pred tonicChord[tonic: Chord] {
@@ -235,44 +237,56 @@ pred wellformedChordProg {
 }
 
 
-// run{
-//     wellformed
-//     majorScale
-//     wellformedChord
-//     wellformedChordProg
-// } for 5 Int, exactly 8 Note, exactly 5 Chord
+pred createRandomNote[melodyNote: Note] {
+    all scale: Scale | {
+        some note1: Note | {
+            (reachable[note1, scale.n0, next] or note1 = scale.n0) implies {
+                melodyNote.value = note1.value
+            }
+        }
+    }
+}
 
 pred createMelody{
     all scale:Scale|{
-        // Create valid note values
-       scale.n0.value<=11 and scale.n0.value>=0 and scale.n0.beat=1
-       scale.n1.value<=11 and scale.n1.value>=0 and scale.n1.beat=1
-       scale.n2.value<=11 and scale.n2.value>=0 and scale.n2.beat=1
-       scale.n3.value<=11 and scale.n3.value>=0 and scale.n3.beat=1
-       scale.n4.value<=11 and scale.n4.value>=0 and scale.n4.beat=1
-       scale.n5.value<=11 and scale.n5.value>=0 and scale.n5.beat=1
-       scale.n6.value<=11 and scale.n6.value>=0 and scale.n6.beat=1
-       scale.n7.value<=11 and scale.n7.value>=0 and scale.n7.beat=1
-       // Create valid sequence
-       scale.n0.next=scale.n1
-       scale.n1.next=scale.n2
-       scale.n2.next=scale.n3
-       scale.n3.next=scale.n4
-       scale.n4.next=scale.n5
-       scale.n5.next=scale.n6
-       scale.n6.next=scale.n7
-       scale.n7.next= none
+        one mel: Melody | {
+            createRandomNote[mel.m0] and mel.m0.beat = 1
+            createRandomNote[mel.m1] and mel.m0.beat = 1
+            createRandomNote[mel.m2] and mel.m0.beat = 1
+            createRandomNote[mel.m3] and mel.m0.beat = 1
+            createRandomNote[mel.m4] and mel.m0.beat = 1
+            createRandomNote[mel.m5] and mel.m0.beat = 1
+            createRandomNote[mel.m6] and mel.m0.beat = 1
+            createRandomNote[mel.m7] and mel.m0.beat = 1
+            createRandomNote[mel.m8] and mel.m0.beat = 1
+            createRandomNote[mel.m9] and mel.m0.beat = 1
+            // Create valid sequence
+       mel.m0.next=mel.m1
+       mel.m1.next=mel.m2
+       mel.m2.next=mel.m3
+       mel.m3.next=mel.m4
+       mel.m4.next=mel.m5
+       mel.m5.next=mel.m6
+       mel.m6.next=mel.m7
+       mel.m7.next=mel.m8
+       mel.m8.next=mel.m9
+       mel.m9.next= none
+    }
+   
     }
     // Notes are distinct/ not themself
-    some scale:Scale, note1, note2:Note|{
-        scale.n0=note1 or 
-        scale.n1=note1 or
-        scale.n2=note1 or
-        scale.n3=note1 or
-        scale.n4=note1 or
-        scale.n5=note1 or
-        scale.n6=note1 or 
-        scale.n7=note1
+    some mel:Melody, note1, note2:Note|{
+        mel.m0=note1 or 
+        mel.m1=note1 or
+        mel.m2=note1 or
+        mel.m3=note1 or
+        mel.m4=note1 or
+        mel.m5=note1 or
+        mel.m6=note1 or 
+        mel.m7=note1 or
+        mel.m8=note1 or
+        mel.m9=note1
+
         reachable[note1, note2, next] implies{
             note1!=note2  
         } or 
@@ -294,3 +308,13 @@ pred simpleTune{
         }
     }
 }
+
+
+run{
+    wellformed
+    majorScale
+    wellformedChord
+    wellformedChordProg
+    createMelody
+    simpleTune
+} for 5 Int, exactly 18 Note, exactly 5 Chord

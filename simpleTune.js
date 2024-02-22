@@ -49,13 +49,18 @@ const chordProg = [
   ChordProgression.c4
 ];
 
-// const chords = Chord.tuples().map((ltup) => ltup);
-
-// const tonicChord = [Chord.root, Chord.third, Chord.fifth];
-
-// const subdomChord = [Chord.root, Chord.third, Chord.fifth];
-
-// const domChord = [Chord.root, Chord.third, Chord.fifth];
+const tuneMelody = [
+  Melody.m0,
+  Melody.m1,
+  Melody.m2,
+  Melody.m3,
+  Melody.m4,
+  Melody.m5,
+  Melody.m6,
+  Melody.m7,
+  Melody.m8,
+  Melody.m9,
+];
 
 // Configuration of the grid
 const scaleGridConfig = {
@@ -114,110 +119,34 @@ chordProg.forEach((chord, idx) => {
   );
 });
 
-// function createChordGridConfig(x) {
-//   // Use parameters in scaleGridConfig
-//   const chordGridConfig = {
-//     // Absolute location in parent (here, of the stage itself)
-//     grid_location: { x: x, y: 250 },
-//     // How large is each cell?
-//     cell_size: { x_size: 65, y_size: 55 },
-//     // How many rows and columns?
-//     grid_dimensions: { y_size: 2, x_size: 3 },
-//   };
 
-//   return chordGridConfig;
-// }
 
-// const tonicChordGrid = new Grid(createChordGridConfig(15));
+const melodyGridConfig = {
+  // Absolute location in parent (here, of the stage itself)
+  grid_location: { x: 20, y: 450 },
+  // How large is each cell?
+  cell_size: { x_size: 60, y_size: 40 },
+  // How many rows and columns?
+  grid_dimensions: { y_size: 3, x_size: 10 },
+};
 
-// tonicChord.forEach((note, idx) => {
-//   tonicChordGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Note ${idx}` }));
-//   // tonicChordGrid.add({ x: idx, y: 1 }, new TextBox({ text: `${note.value}` }));
-//   // tonicChordGrid.add(
-//   //   { x: idx, y: 1 },
-//   //   new TextBox({
-//   //     text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//   //   })
-//   // );
-// });
+const melodyGrid = new Grid(melodyGridConfig);
 
-// const subdomChordGrid = new Grid(createChordGridConfig(230));
-
-// subdomChord.forEach((note, idx) => {
-//   subdomChordGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Note ${idx}` }));
-//   // subdomChordGrid.add({ x: idx, y: 1 }, new TextBox({ text: `${note.value}` }));
-//   // subdomChordGrid.add(
-//   //   { x: idx, y: 1 },
-//   //   new TextBox({
-//   //     text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//   //   })
-//   // );
-// });
-
-// const domChordGrid = new Grid(createChordGridConfig(440));
-
-// domChord.forEach((note, idx) => {
-//   domChordGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Note ${idx}` }));
-//   // domChordGrid.add({ x: idx, y: 1 }, new TextBox({ text: `${note.value}` }));
-//   // domChordGrid.add(
-//   //   { x: idx, y: 1 },
-//   //   new TextBox({
-//   //     text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//   //   })
-//   // );
-// });
-
-// chords.forEach((chordVal, idx) => {
-//   // if (idx == 0) {
-//   //  tonicChordGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Note ${idx}` }));
-//   // }
-
-//   // Populate label
-//   // if (idx == 0) {
-//   //     tonicChordGrid.add({ x: 0, y: idx }, new TextBox({ text: `${chordVal.id()}` }));
-//   // }
-//   // if (idx == 1) {
-//   //   subdomChordGrid.add({ x: 0, y: idx }, new TextBox({ text: `${chordVal.id()}` }));
-//   // }
-
-//   // if (idx == 2) {
-//   //   domChordGrid.add({ x: 0, y: idx }, new TextBox({ text: `${chordVal.id()}` }));
-//   // }
-//   //Populate cut numbers for each chamber
-//   //chordVal.forEach((val, i) => {
-//   tonicChord.forEach((note, i) => {
-//     tonicChordGrid.add(
-//       { x: i, y: 1 },
-//       new TextBox({
-//         text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//       })
-//     );
-//   });
-
-//   subdomChord.forEach((note, i) => {
-//     subdomChordGrid.add(
-//       { x: i, y: 1 },
-//       new TextBox({
-//         text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//       })
-//     );
-//   });
-
-//   domChord.forEach((note, i) => {
-//     domChordGrid.add(
-//       { x: i, y: 1 },
-//       new TextBox({
-//         text: `${numberToNote(parseInt(Object.values(note.value)))}`,
-//       })
-//     );
-//   });
-// });
+// Populate solution numbers
+tuneMelody.forEach((note, idx) => {
+    melodyGrid.add({ x: idx, y: 0 }, new TextBox({ text: `Note ${idx}` }));
+    melodyGrid.add({ x: idx, y: 1 }, new TextBox({ text: `${note.value}` }));
+    melodyGrid.add(
+      { x: idx, y: 2 },
+      new TextBox({
+        text: `${numberToNote(parseInt(Object.values(note.value)))}`,
+      })
+    );
+});
 
 // Finally, render everything
 const stage = new Stage();
 stage.add(scaleGrid);
-// stage.add(tonicChordGrid);
-// stage.add(subdomChordGrid);
-// stage.add(domChordGrid);
 stage.add(chordProgGrid);
+stage.add(melodyGrid);
 stage.render(svg);
