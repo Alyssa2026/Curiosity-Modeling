@@ -34,8 +34,7 @@ sig Chord{
     root: one Note, 
    	third: one Note,
     fifth: one Note,
-    chordNext: lone Chord,
-    twoBeats: one Int // NEED TO CHAGE
+    chordNext: lone Chord
 }
 -- A simple tune needs a melody
     -- m0-m9 are the 10 notes in a melody
@@ -168,31 +167,51 @@ pred minorScale{
     -- For this tune, it must be 2 beats long
 pred wellformedChord{
     all chord:Chord|{
-        chord.twoBeats=2 // NEED TO FIX
+        chord.root.beat=2 
+        chord.third.beat=2
+        chord.fifth.beat=2
     }
 }
 -- Creating a tonic chord
 pred tonicChord[tonic: Chord] {
     all scale:Scale|{
-        tonic.root=scale.n0
-        tonic.third=scale.n2
-        tonic.fifth=scale.n4
+        // Set correct values of chord
+        tonic.root.value=scale.n0.value
+        tonic.third.value=scale.n2.value
+        tonic.fifth.value=scale.n4.value
+
+        // All notes next points to nothing because they get played at the same time
+        tonic.root.next=none
+        tonic.third.next=none
+        tonic.fifth.next=none
     }
 }
 -- Creating a subdominant chord
 pred subdominantChord[subdominant: Chord]{
     all scale:Scale|{
-        subdominant.root=scale.n0
-        subdominant.third=scale.n3
-        subdominant.fifth=scale.n5
+        // Set correct values of chord
+        subdominant.root.value=scale.n0.value
+        subdominant.third.value=scale.n3.value
+        subdominant.fifth.value=scale.n5.value
+
+        // All notes next points to nothing because they get played at the same time
+        subdominant.root.next=none
+        subdominant.third.next=none
+        subdominant.fifth.next=none
     }
 }
 -- creating a dominant chord
 pred dominantChord[dominant: Chord]{
     all scale:Scale| {
-        dominant.root=scale.n6
-        dominant.third=scale.n1
-        dominant.fifth=scale.n4
+        // Set correct values of chord
+        dominant.root.value=scale.n6.value
+        dominant.third.value=scale.n1.value
+        dominant.fifth.value=scale.n4.value
+
+        // All notes next points to nothing because they get played at the same time
+        dominant.root.next=none
+        dominant.third.next=none
+        dominant.fifth.next=none
     }
 }
 // run{
@@ -211,7 +230,7 @@ pred createRandomNote[melodyNote: Note] {
     all scale: Scale | {
         some note1: Note | {
             (reachable[note1, scale.n0, next] or note1 = scale.n0)
-                melodyNote.value = note1.value
+            melodyNote.value = note1.value
         }
     }
 }
@@ -261,7 +280,7 @@ pred createMelody{
             note1!=note2  
         } or 
         reachable[note2, note1, next] implies {
-             note1!=note2
+            note1!=note2
         }
     }
 }
@@ -275,7 +294,7 @@ pred wellformedChordProg {
             tonicChord[chordProg.c2]
             dominantChord[chordProg.c3]
             tonicChord[chordProg.c4]
-
+            // Create sequence of chords
             chordProg.c0.chordNext = chordProg.c1
             chordProg.c1.chordNext = chordProg.c2
             chordProg.c2.chordNext = chordProg.c3
@@ -320,4 +339,4 @@ run{
     wellformedChordProg
     createMelody
     simpleTune
-} for 5 Int, exactly 18 Note, exactly 5 Chord
+} for 5 Int, exactly 25 Note, exactly 5 Chord
