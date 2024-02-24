@@ -71,7 +71,7 @@ one sig SimpleTune{
     -- Each note must have values between 0-11 (notes a-g)
     -- The notes in the scale should not be the same
     -- Each note points to a next note or none
-pred wellformed{
+pred wellformedSequence{
     all scale:Scale|{
         // Create valid note values
        scale.n0.value<=11 and scale.n0.value>=0 and scale.n0.beat=1
@@ -141,6 +141,8 @@ pred majorScale{
         }
     }
 }
+
+-- Predicate to create a minor scale
 pred minorScale{
     -- minor scale follows WHWWWWH
     all scale:Scale, note: Note|{
@@ -159,7 +161,6 @@ pred minorScale{
 //     wellformed
 //     majorScale
 // } for 5 Int, exactly 8 Note
--- Predicate to create a minor scale
 ----------------------------------------------------------------------------------------------------
 -- (2) Model the chords using the scales
 ----------------------------------------------------------------------------------------------------
@@ -227,12 +228,13 @@ pred dominantChord[dominant: Chord]{
 ----------------------------------------------------------------------------------------------------
 -- Helper to set a note in melody to a random note within the scale
 pred createRandomNote[melodyNote: Note] {
-    all scale: Scale | {
+   // all scale: Scale | {
+ 
         some note1: Note | {
-            (reachable[note1, scale.n0, next] or note1 = scale.n0)
+            (reachable[note1, Scale.n0, next] or note1 = Scale.n0)
             melodyNote.value = note1.value
         }
-    }
+ //  }
 }
 -- Creates teh melody by assigning each note to a random note within the scale
     -- Ensures the notes point to next correctly
@@ -333,10 +335,10 @@ pred simpleTune{
     }
 }
 run{
-    wellformed
+    wellformedSequence
     majorScale
     wellformedChord
     wellformedChordProg
     createMelody
     simpleTune
-} for 5 Int, exactly 25 Note, exactly 5 Chord
+} for 5 Int, 25 Note, exactly 5 Chord
