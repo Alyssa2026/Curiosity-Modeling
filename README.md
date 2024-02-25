@@ -78,4 +78,4 @@ Due to the complexity of music theory and developing music, we made a lot of abs
  - Forth, a large abstraction we made for our tune is that it only describs each notes raw value (a,b,c,d etc.) without consideration of pitch, octave, etc. 
 Overall, as mentioned, music is complex, but we enjoyed using the musical concepts we have learned from many years to create a fun simple tune :). 
 
-Feel free to listen to an awesome, beautiful simple tune created by our mode here.
+Feel free to listen to an awesome, beautiful simple tune created by our model here.
