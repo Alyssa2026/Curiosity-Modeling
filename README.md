@@ -1,7 +1,5 @@
 # Curiosity-Modeling: Simple Tune
 
-### Click here to listen to a sample tune modeled by forge!
-
 ### Project Objective:
 
 Overall, we are trying to model a simple tune for 10 beats.
