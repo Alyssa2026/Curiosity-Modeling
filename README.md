@@ -66,8 +66,6 @@ Predicates:
 
 ### Testing:
 
-What tests did you write to test your model itself? What tests did you write to verify properties about your domain area? Feel free to give a high-level overview of this.
-
 We wrote a test for every predicate, and focused on testing configurations that would not satisfy 
 the predicate. For all the wellformed predicates the tests focus on ensuring the correct sequence
 of the notes/chords, making sure that any two notes/chords are not the same, any note does not
@@ -86,4 +84,3 @@ Due to the complexity of music theory and developing music, we made a lot of abs
  - Forth, a large abstraction we made for our tune is that it only describs each notes raw value (a,b,c,d etc.) without consideration of pitch, octave, etc. 
 Overall, as mentioned, music is complex, but we enjoyed using the musical concepts we have learned from many years to create a fun simple tune :). 
 
-Feel free to listen to an awesome, beautiful simple tune created by our model here.
