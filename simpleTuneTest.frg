@@ -2,16 +2,6 @@
 
 open "simpleTune.frg"
 
-// pred validNotes {
-//     all disj n1, n2: Note | {
-//        // n1 != n2
-//         n1.value >= 0 and n1.value <= 11 and n1.beat = 1
-//         n2.value >= 0 and n2.value <= 11 and n2.beat = 1
-
-//         #{Note} = 8
-//     }
-// }
-
 test suite for wellformedSequence {
 
     test expect {
@@ -52,60 +42,10 @@ test suite for wellformedSequence {
             Scale.n0.next = Scale.n3
         } is unsat
     }
-
-   //assert validNotes is sufficient for wellformedSequence
-
-    //  example validScale is {wellformedSequence} for {
-    //         Scale = `scale
-    //         Note = `n7 + `n1 + `n2 + `n3 + `n4 + `n5 + `n6 + `n0
-    //         `n5.value = 0 
-    //         `n6.value = 2 
-    //         `n7.value = 11
-    //         `n0.value = 4
-    //         `n1.value = 8 
-    //         `n2.value = 9
-    //         `n3.value = 1
-    //         `n4.value = 4
-
-    //         `n0.beat = 1
-    //         `n1.beat = 1 
-    //         `n2.beat = 1
-    //         `n3.beat = 1
-    //         `n4.beat = 1
-    //         `n5.beat = 1 
-    //         `n6.beat = 1 
-    //         `n7.beat = 1
-
-    //         `scale.n0 = `n0
-    //         `scale.n1 = `n1
-    //         `scale.n2 = `n2
-    //         `scale.n3 = `n3
-    //         `scale.n4 = `n4
-    //         `scale.n5 = `n5
-    //         `scale.n6 = `n6
-    //         `scale.n7 = `n7
-
-    //         `n0.next = `n1
-    //         `n1.next = `n2
-    //         `n2.next = `n3
-    //         `n3.next = `n4
-    //         `n4.next = `n5
-    //         `n5.next = `n6
-    //         `n6.next = `n7
-    //     } for 5 Int 
 }
 
-// pred largeStep {
-//     some disj n1, n2: Note | {
-//         subtract[n1.value, n2.value] = 5
-//     }
-// }
 
-// pred notWholeStep {
-//     not wholeStep
-// }
 test suite for wholeStep {
-      // assert largeStep is sufficient for notWholeStep
 
     test expect {
         largeWholeStep : { // step that is too big (7)
@@ -126,7 +66,7 @@ test suite for wholeStep {
             }
         } is unsat
 
-        validWholeStep : { // when i do wholeStep and sat it produces undefined... 
+        validWholeStep : { 
             wellformedSequence
             some disj n1, n2: Note | {
                 n1.value = 1
@@ -157,7 +97,7 @@ test suite for halfStep {
             }
         } is unsat
 
-        validHalfStep : { // when i do halfStep and sat it produces undefined... 
+        validHalfStep : { 
             wellformedSequence
             some disj n1, n2: Note | {
                 n1.value = 1
@@ -260,23 +200,10 @@ test suite for wellformedChord {
 
 }
 
-pred tonicChord[tonic: Chord] {
-    all scale:Scale|{
-        // Set correct values of chord
-        tonic.root.value=scale.n0.value
-        tonic.third.value=scale.n2.value
-        tonic.fifth.value=scale.n4.value
-
-        // All notes next points to nothing because they get played at the same time
-        tonic.root.next=none
-        tonic.third.next=none
-        tonic.fifth.next=none
-    }
-}
 
 test suite for tonicChord {
     test expect {
-        incorrectRoot : { // tonic root is scale n6 istead of n0
+        incorrectTonicRoot : { // tonic root is scale n6 istead of n0
             wellformedSequence
             some c: Chord | {
                 c.root = Scale.n6
@@ -286,7 +213,7 @@ test suite for tonicChord {
             }
         } is unsat
 
-        incorrectThird : { // tonic third is scale n3 istead of n2
+        incorrectTonicThird : { // tonic third is scale n3 istead of n2
             wellformedSequence
             some c: Chord | {
                 c.root = Scale.n0
@@ -295,7 +222,8 @@ test suite for tonicChord {
                 tonicChord[c]
             }
         } is unsat
-        incorrectFifth : { // tonic fifth is scale n5 istead of n4
+
+        incorrectTonicFifth : { // tonic fifth is scale n5 istead of n4
             wellformedSequence
             some c: Chord | {
                 c.root = Scale.n0
@@ -304,5 +232,287 @@ test suite for tonicChord {
                 tonicChord[c]
             }
         } is unsat
+
+        validTonic : { // valid tonic chord
+            wellformedSequence
+            some c: Chord {
+                c.root.value = Scale.n0.value
+                c.third.value = Scale.n2.value
+                c.fifth.value = Scale.n4.value
+                not tonicChord[c] 
+            }
+        } is unsat
     }
+}
+
+test suite for subdominantChord {
+    test expect {
+        incorrectSubdomRoot : { // subdom root is scale n6 istead of n0
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n6
+                c.third = Scale.n2
+                c.fifth = Scale.n4
+                subdominantChord[c]
+            }
+        } is unsat
+
+        incorrectSubdomThird : { // subdom third is scale n6 istead of n3
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n0
+                c.third = Scale.n3
+                c.fifth = Scale.n4
+                subdominantChord[c]
+            }
+        } is unsat
+
+        incorrectSubdomFifth : { // subdom fifth is scale n2 istead of n5
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n0
+                c.third = Scale.n2
+                c.fifth = Scale.n5
+                subdominantChord[c]
+            }
+        } is unsat
+
+        validSubdom : { // valid subdominant chord
+            wellformedSequence
+            some c: Chord {
+                c.root.value = Scale.n0.value
+                c.third.value = Scale.n3.value
+                c.fifth.value = Scale.n5.value
+                not subdominantChord[c] 
+            }
+        } is unsat
+    }
+}
+
+test suite for dominantChord {
+    test expect {
+        incorrectDomRoot : { // subdom root is scale n5 istead of n0
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n5
+                c.third = Scale.n1
+                c.fifth = Scale.n4
+                dominantChord[c]
+            }
+        } is unsat
+
+        incorrectDomThird : { // subdom third is scale n6 istead of n1
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n6
+                c.third = Scale.n6
+                c.fifth = Scale.n4
+                dominantChord[c]
+            }
+        } is unsat
+
+        incorrectDomFifth : { // subdom fifth is scale n2 istead of n4
+            wellformedSequence
+            some c: Chord | {
+                c.root = Scale.n6
+                c.third = Scale.n1
+                c.fifth = Scale.n5
+                dominantChord[c]
+            }
+        } is unsat
+
+        validDom : { // valid subdominant chord
+            wellformedSequence
+            some c: Chord {
+                c.root.value = Scale.n6.value
+                c.third.value = Scale.n1.value
+                c.fifth.value = Scale.n4.value
+                not dominantChord[c] 
+            }
+        } is unsat
+    }
+}
+
+test suite for createRandomNote {
+    test expect {
+        randomNoteNotInScale : { // cannot create a note that's not in the scale
+            wellformedSequence
+            some disj n1, n2: Note | {
+                not reachable[n1, Scale.n0, next] and n1 = Scale.n0
+                createRandomNote[n2]
+            }
+        } is unsat
+
+        validNote : { // there will always be a random note that can be produced 
+            wellformedSequence
+            not createRandomNote[Scale.n0]
+        } is unsat
+
+        noteIs4: {
+            wellformedSequence
+            some disj n1, n2: Note | {
+                n1 = Scale.n4
+                not createRandomNote[n2]
+            }
+        } is unsat
+    }
+}
+
+test suite for createMelody {
+    test expect {
+        incorrectBeatVals: { // all melody notes must be 1 beat
+            createMelody 
+            Melody.m0.beat = 3
+            Melody.m1.beat = 1
+            Melody.m2.beat = 3
+            Melody.m3.beat = 2
+            Melody.m4.beat = 3
+            Melody.m5.beat = 3
+            Melody.m6.beat = 3
+            Melody.m7.beat = 1
+            Melody.m8.beat = 3
+            Melody.m9.beat = 0
+        } is unsat
+
+        incorrectNoteVals: {
+            createMelody 
+            Melody.m0.value = -1
+            Melody.m1.value = 14
+            Melody.m2.value = 2
+            Melody.m3.value = 5
+            Melody.m4.value = 0
+            Melody.m5.value = -4
+            Melody.m6.value = 2
+            Melody.m7.value = 3
+            Melody.m8.value = -1
+            Melody.m9.value = 11
+        } is unsat
+
+        nextSelf : { // a note is its own next
+            createMelody
+            some note: Note | {
+                (reachable[note, Melody.m0, next] or note = Melody.m0)
+                note.next = note
+            }
+        } is unsat 
+
+        sameNote : { // two notes are the same
+            createMelody
+            Melody.m1 = Melody.m2
+        } is unsat 
+    }
+}
+
+pred invalidBeatLength {
+    some n: Note | {
+        n.beat = 2
+    }
+}
+
+pred invalidNotes {
+    some n: Note | {
+        n.value = -1
+    } 
+}
+
+pred sameNotes {
+    some note: Note | {
+        (reachable[note, Melody.m0, next] or note = Melody.m0)
+        note.next = note
+    }
+}
+
+pred notCreateMelody {
+    not createMelody
+}
+
+test suite for notCreateMelody { // purpose: use assert statements to test bad cases of melody
+    assert invalidBeatLength is sufficient for notCreateMelody
+    assert invalidNotes is sufficient for notCreateMelody
+    assert sameNotes is sufficient for notCreateMelody
+}
+
+
+pred wellformedChordProg {
+    one scale: Scale | {
+        // Create the correct sequance of chords to act as bass
+        one chordProg: ChordProgression | {
+            tonicChord[chordProg.c0]
+            subdominantChord[chordProg.c1]
+            tonicChord[chordProg.c2]
+            dominantChord[chordProg.c3]
+            tonicChord[chordProg.c4]
+            // Create sequence of chords
+            chordProg.c0.chordNext = chordProg.c1
+            chordProg.c1.chordNext = chordProg.c2
+            chordProg.c2.chordNext = chordProg.c3
+            chordProg.c3.chordNext = chordProg.c4
+            chordProg.c4.chordNext = none
+        }
+        // Ensure chords dont equal each other 
+        some chordProg:ChordProgression, chord1, chord2:Chord|{
+            chordProg.c0=chord1 or 
+            chordProg.c1=chord1 or 
+            chordProg.c2=chord1 or 
+            chordProg.c3=chord1 or 
+            chordProg.c4=chord1
+
+            reachable[chord1, chord2, chordNext] implies{
+                chord1!=chord2  
+            } or 
+            reachable[chord2, chord1, chordNext] implies {
+                chord1!=chord2
+            }
+        }
+    }
+}
+
+test suite for wellformedChordProg {
+    test expect {
+        incorrectChordTypes: { // all chords shifted by 1
+            wellformedChordProg
+            tonicChord[ChordProgression.c1]
+            subdominantChord[ChordProgression.c2]
+            tonicChord[ChordProgression.c3]
+            dominantChord[ChordProgression.c4]
+            tonicChord[ChordProgression.c0]
+        } is unsat
+
+        incorrectChordOrder: {
+            wellformedChordProg
+            ChordProgression.c0.chordNext = ChordProgression.c3
+            ChordProgression.c1.chordNext = ChordProgression.c4
+            ChordProgression.c2.chordNext = ChordProgression.c1
+            ChordProgression.c3.chordNext = ChordProgression.c2
+            ChordProgression.c4.chordNext = none
+        } is unsat
+
+        sameChords: { // two chords in the progression are the same
+            wellformedChordProg
+            ChordProgression.c1 = ChordProgression.c2
+        } is unsat
+
+        nextChordSelf : { // a chord is its own next
+            wellformedChordProg
+            some chord: Chord | {
+                (reachable[chord, ChordProgression.c0, chordNext] or chord = ChordProgression.c0)
+                chord.chordNext = chord
+            }
+        } is unsat 
+    }
+}
+
+pred sameChords {
+    some chord: Chord | {
+        (reachable[chord, ChordProgression.c0, chordNext] or chord = ChordProgression.c0)
+        chord.chordNext = chord
+    }
+}
+
+pred notWellformedChordProg {
+    not wellformedChordProg
+}
+
+test suite for notWellformedChordProg { 
+    assert sameChords is sufficient for notWellformedChordProg
 }

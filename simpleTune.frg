@@ -227,14 +227,11 @@ pred dominantChord[dominant: Chord]{
 -- (3) Model a simple 5 measure tune with the chords and scales
 ----------------------------------------------------------------------------------------------------
 -- Helper to set a note in melody to a random note within the scale
-pred createRandomNote[melodyNote: Note] {
-   // all scale: Scale | {
- 
-        some note1: Note | {
-            (reachable[note1, Scale.n0, next] or note1 = Scale.n0)
-            melodyNote.value = note1.value
-        }
- //  }
+pred createRandomNote[melodyNote: Note] { 
+    some note1: Note | {
+        (reachable[note1, Scale.n0, next] or note1 = Scale.n0)
+        melodyNote.value = note1.value
+    }
 }
 -- Creates teh melody by assigning each note to a random note within the scale
     -- Ensures the notes point to next correctly
@@ -322,16 +319,9 @@ pred wellformedChordProg {
 }
 -- Putting everything together to create a simple 5 measure simple tune!
 pred simpleTune{
-    one scale:Scale|{
-        one chordProg:ChordProgression|{
-            one mel: Melody|{
-                one simpleTune:SimpleTune|{
-                    simpleTune.melody=mel // melody 
-                    simpleTune.bass= chordProg // bass
-                }
-            }
-            
-        }
+    one simpleTune:SimpleTune|{
+        simpleTune.melody=Melody // melody 
+        simpleTune.bass= ChordProgression // bass
     }
 }
 run{

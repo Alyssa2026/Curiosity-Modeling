@@ -70,6 +70,16 @@ Predicates:
 
 What tests did you write to test your model itself? What tests did you write to verify properties about your domain area? Feel free to give a high-level overview of this.
 
+We wrote a test for every predicate, and focused on testing configurations that would not satisfy 
+the predicate. For all the wellformed predicates the tests focus on ensuring the correct sequence
+of the notes/chords, making sure that any two notes/chords are not the same, any note does not
+point to itself, and notes/chords are the right length and within the correct range of note values
+(0-11). We tested the smaller predicates such as whole and half steps by creating examples that
+contradicted our predicates. For predicates such as creating a valid scale or melody, we
+constructed these "objects" with faults in them to ensure that they wouldn't be a valid example 
+of the predicates. We used a mix of test expects as well as assert statements to ensure a wide 
+variety of tests.
+
 ### Abstractions and Assumptions:
 Due to the complexity of music theory and developing music, we made a lot of abstractions and assumptions for this model.
  - First, we confined our scale and key to only major and minor scales. There are dozens of unique scales we could of used to be the fundemental block of our simple tune, but we stuck to the most common and basic scales.
